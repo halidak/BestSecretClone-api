@@ -8,7 +8,6 @@ public class PmaApiApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(PmaApiApplication.class, args);
-		//proba
 	}
 
 }
