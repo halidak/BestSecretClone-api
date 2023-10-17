@@ -1,5 +1,6 @@
 package com.example.pmaapi.auth;
 
+import com.example.pmaapi.auth.request.LoginRequest;
 import com.example.pmaapi.auth.request.RegisterRequest;
 import com.example.pmaapi.auth.response.AuthenticationResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,5 +22,12 @@ public class AuthenticationController {
             @RequestBody RegisterRequest request
     ){
         return ResponseEntity.ok(authService.register(request));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> login(
+            @RequestBody LoginRequest request
+    ){
+        return ResponseEntity.ok(authService.login(request));
     }
 }

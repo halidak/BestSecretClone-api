@@ -1,5 +1,6 @@
 package com.example.pmaapi.auth;
 
+import com.example.pmaapi.auth.request.LoginRequest;
 import com.example.pmaapi.auth.request.RegisterRequest;
 import com.example.pmaapi.auth.response.AuthenticationResponse;
 import com.example.pmaapi.config.JwtService;
@@ -9,6 +10,7 @@ import com.example.pmaapi.user.response.UserDTOMapper;
 import com.example.pmaapi.user.response.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -48,5 +50,23 @@ public class AuthenticationService {
                 .user(userDTOMapper.apply(user))
                 .build();
     }
-
+    public AuthenticationResponse login(LoginRequest request) {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+            );
+            var user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow();
+            var jwtToken = jwtService.generateToken(user);
+            return AuthenticationResponse.builder()
+                    .token(jwtToken)
+                    .user(userDTOMapper.apply(user))
+                    .build();
+        } catch (Exception e) {
+            throw new IllegalStateException("Invalid email or password");
+        }
+    }
 }
