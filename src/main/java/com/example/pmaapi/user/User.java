@@ -1,5 +1,7 @@
-package com.example.pmaapi.user.response;
+package com.example.pmaapi.user;
 
+import com.example.pmaapi.addressData.AddressData;
+import com.example.pmaapi.user.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,6 +47,15 @@ public class User implements UserDetails {
     private String profilePicture;
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @OneToMany(
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(
+            name = "user_id",
+            referencedColumnName = "id"
+    )
+    private List<AddressData> addressData;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

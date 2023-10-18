@@ -1,6 +1,6 @@
 package com.example.pmaapi.config;
 
-import com.example.pmaapi.user.response.UserRepository;
+import com.example.pmaapi.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

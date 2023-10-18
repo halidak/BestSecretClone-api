@@ -1,4 +1,4 @@
-package com.example.pmaapi.user.response;
+package com.example.pmaapi.user;
 
 public record UserDTO(
         Long id,

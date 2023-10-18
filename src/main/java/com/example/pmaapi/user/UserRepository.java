@@ -1,5 +1,6 @@
-package com.example.pmaapi.user.response;
+package com.example.pmaapi.user;
 
+import com.example.pmaapi.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package com.example.pmaapi.user.response;
+package com.example.pmaapi.user;
 
 public enum Role {
     CUSTOMER,

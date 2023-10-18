@@ -1,6 +1,6 @@
 package com.example.pmaapi.auth.request;
 
-import com.example.pmaapi.user.response.Role;
+import com.example.pmaapi.user.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

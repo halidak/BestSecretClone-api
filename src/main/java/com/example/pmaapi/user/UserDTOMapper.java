@@ -1,5 +1,7 @@
-package com.example.pmaapi.user.response;
+package com.example.pmaapi.user;
 
+import com.example.pmaapi.user.User;
+import com.example.pmaapi.user.UserDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
