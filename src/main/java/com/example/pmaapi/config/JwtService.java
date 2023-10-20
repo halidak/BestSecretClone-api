@@ -1,11 +1,16 @@
 package com.example.pmaapi.config;
 
+import com.example.pmaapi.user.User;
+import com.example.pmaapi.user.UserDTOMapper;
+import com.example.pmaapi.user.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +21,13 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService {
 
     private static final String SECRET_KEY = System.getenv("jwt_secret");
+    private final UserRepository userRepository;
+    private final UserDTOMapper userDTOMapper;
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -28,20 +37,18 @@ public class JwtService {
         return  claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails){
-        return  generateToken(new HashMap<>(), userDetails);
+    public String generateToken(User user) {
+        return generateToken(new HashMap<>(), user);
     }
 
-    public String generateToken(
-            Map<String, Object> extraClaims,
-            UserDetails userDetails
-    ){
-        return Jwts
-                .builder()
+
+    public String generateToken(Map<String, Object> extraClaims, User user) {
+        extraClaims.put("id", user.getId().toString()); // Set the "id" claim
+        return Jwts.builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
+                .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 10))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -59,12 +66,11 @@ public class JwtService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    private Claims extractAllClaims(String token){
-        return Jwts
-                .parserBuilder()
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build()
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token)
                 .getBody();
     }
 
@@ -72,4 +78,26 @@ public class JwtService {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
+
+    public Long extractId(String header) {
+        Long id = Long.valueOf(extractClaim(header, Claims::getId));
+        return id;
+    }
+
+    public String extractTokenFromHeader(String header) {
+        return header.substring(7);
+    }
+
+    public String extractEmail(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+
+    public User getUserFromToken(String header) {
+        String token = extractTokenFromHeader(header);
+        //Long id = extractId(token);
+        String email = extractUsername(token);
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
 }

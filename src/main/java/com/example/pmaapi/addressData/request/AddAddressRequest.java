@@ -15,5 +15,4 @@ public class AddAddressRequest {
     private String city;
     private String ptt;
     private Long userId;
-
 }

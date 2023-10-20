@@ -1,6 +1,7 @@
 package com.example.pmaapi.addressData;
 
 import com.example.pmaapi.user.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,6 +32,7 @@ public class AddressData {
     private String city;
     private String ptt;
 
+    @JsonIgnore
     @ManyToOne(
             cascade = CascadeType.ALL
     )

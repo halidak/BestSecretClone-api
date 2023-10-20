@@ -2,6 +2,7 @@ package com.example.pmaapi.user;
 
 import com.example.pmaapi.addressData.AddressData;
 import com.example.pmaapi.user.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,6 +49,7 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @JsonIgnore
     @OneToMany(
             cascade = CascadeType.ALL
     )
