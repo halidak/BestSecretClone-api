@@ -33,9 +33,7 @@ public class AddressData {
     private String ptt;
 
     @JsonIgnore
-    @ManyToOne(
-            cascade = CascadeType.ALL
-    )
+    @ManyToOne()
     @JoinColumn(
             name = "user_id",
             referencedColumnName = "id"
