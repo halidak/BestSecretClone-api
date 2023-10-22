@@ -34,8 +34,8 @@ public class AddressDataService {
 
             return addressDataRepository.save(data);
         } catch (Exception e) {
-            e.printStackTrace(); // Log the exception for debugging.
-            return null; // Return a proper response or throw a custom exception as needed.
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -56,7 +56,6 @@ public class AddressDataService {
         AddressData existingAddress = addressDataRepository.findById(id).orElse(null);
 
         if (existingAddress != null) {
-            // Ako adresa postoji, ažurirajte je
             existingAddress.setAddress(request.getAddress());
             existingAddress.setPtt(request.getPtt());
             existingAddress.setCity(request.getCity());

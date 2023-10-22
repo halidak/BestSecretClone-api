@@ -1,6 +1,6 @@
-package com.example.pmaapi.product;
+package com.example.pmaapi.category;
 
-import com.example.pmaapi.category.Category;
+import com.example.pmaapi.product.Product;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,36 +8,36 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Table
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Product {
+public class Category {
 
     @Id
     @SequenceGenerator(
-            name = "product_sequence",
-            sequenceName = "product_sequence",
+            name = "category_sequence",
+            sequenceName = "category_sequence",
             allocationSize = 1
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "product_sequence"
+            generator = "category_sequence"
     )
     private Long id;
     private String name;
-    private float price;
-    private String description;
-    @Enumerated(EnumType.STRING)
-    private Gender gender;
 
     @JsonIgnore
-    @ManyToOne
+    @OneToMany(
+            cascade = CascadeType.ALL
+    )
     @JoinColumn(
             name = "category_id",
             referencedColumnName = "id"
     )
-    private Category category;
+    private List<Product> products;
 }
