@@ -1,12 +1,15 @@
 package com.example.pmaapi.product;
 
 import com.example.pmaapi.category.Category;
+import com.example.pmaapi.product.productImages.ProductImages;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Table
@@ -40,4 +43,14 @@ public class Product {
             referencedColumnName = "id"
     )
     private Category category;
+
+    @JsonIgnore
+    @OneToMany(
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(
+            name = "product_id",
+            referencedColumnName = "id"
+    )
+    private List<ProductImages> images;
 }
