@@ -21,10 +21,8 @@ public class ProductController {
         return ResponseEntity.ok(productDTO);
     }
 
-    @GetMapping("/get-by-category")
-    public ResponseEntity<List<ProductDTO>> getProductsByCategoryAndGender(
-            @RequestParam("categoryId") Long categoryId
-    ){
+    @GetMapping("/get-by-category/{categoryId}")
+    public ResponseEntity<List<ProductDTO>> getProductsByCategoryAndGender(@PathVariable Long categoryId){
         return  ResponseEntity.ok(productService.getProductsByCategory(categoryId));
     }
 

@@ -50,8 +50,7 @@ public class ProductService {
     }
 
     public List<ProductDTO> getProductsByCategory(Long categoryId) {
-        Category category = categoryRepository.findById(categoryId).orElse(null);
-        List<Product> products = productRepository.findByCategory(category);
+        List<Product> products = productRepository.findByCategoryId(categoryId);
         ProductDTOMapper mapper = new ProductDTOMapper();
         List<ProductDTO> productDTOs = products.stream()
                 .map(product -> mapper.apply(product))
