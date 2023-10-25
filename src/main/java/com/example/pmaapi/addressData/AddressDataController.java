@@ -47,7 +47,7 @@ public class AddressDataController {
         return ResponseEntity.ok("Adresa sa ID " + id + " je uspešno obrisana.");
     }
 
-    @PutMapping("/address/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<AddressData> updateAddress(@PathVariable Long id, @RequestBody UpdateAddress request) {
         AddressData updatedAddress = addressDataService.updateAddress(id, request);
 
