@@ -2,6 +2,7 @@ package com.example.pmaapi.product;
 
 import com.example.pmaapi.category.Category;
 import com.example.pmaapi.product.productImages.ProductImages;
+import com.example.pmaapi.sizes.ProductClothingSizes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table
@@ -53,4 +55,7 @@ public class Product {
             referencedColumnName = "id"
     )
     private List<ProductImages> images;
+
+    @OneToMany(mappedBy = "product")
+    Set<ProductClothingSizes> productClothingSizes;
 }
