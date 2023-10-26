@@ -15,7 +15,8 @@ public class ProductDTOMapper implements Function<Product, ProductDTO> {
                 product.getDescription(),
                 product.getGender(),
                 product.getCategory(),
-                product.getImages()
+                product.getImages(),
+                product.getProductClothingSizes()
         );
     }
 }

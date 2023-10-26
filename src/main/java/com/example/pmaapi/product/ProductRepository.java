@@ -13,4 +13,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     List<Product> findByCategoryIdAndGender(Long categoryId, Gender gender);
 
+    @Query("SELECT DISTINCT p FROM Product p " +
+            "LEFT JOIN FETCH p.productClothingSizes pcs " +
+            "LEFT JOIN FETCH pcs.clothingSize " +
+            "WHERE p.id = :productId")
+    Product findProductWithSizes(@Param("productId") Long productId);
+
 }

@@ -17,7 +17,15 @@ import lombok.NoArgsConstructor;
 public class ProductClothingSizes {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(
+            name = "product-csize_sequence",
+            sequenceName = "product-csize_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "product-csize_sequence"
+    )
     private Long id;
 
     @ManyToOne

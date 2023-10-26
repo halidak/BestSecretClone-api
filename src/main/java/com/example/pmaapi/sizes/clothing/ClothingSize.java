@@ -1,6 +1,7 @@
 package com.example.pmaapi.sizes.clothing;
 
 import com.example.pmaapi.sizes.ProductClothingSizes;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

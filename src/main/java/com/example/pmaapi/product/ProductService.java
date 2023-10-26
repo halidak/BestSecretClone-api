@@ -9,11 +9,14 @@ import com.example.pmaapi.product.productImages.ProductImagesRepository;
 import com.example.pmaapi.product.request.AddImages;
 import com.example.pmaapi.product.request.AddProduct;
 import com.example.pmaapi.product.request.UpdateProduct;
+import com.example.pmaapi.sizes.ProductClothingSizes;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -104,9 +107,12 @@ public class ProductService {
         return  null;
     }
 
+
+
     public ProductDTO getProductById(Long productId){
         Product product = productRepository.findById(productId).orElse(null);
-
+        Set<ProductClothingSizes> productClothingSizes = new HashSet<>();
+        product.setProductClothingSizes(productClothingSizes);
         ProductDTOMapper mapper = new ProductDTOMapper();
         ProductDTO productDTO = mapper.apply(product);
 

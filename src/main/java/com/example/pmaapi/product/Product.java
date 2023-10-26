@@ -56,6 +56,6 @@ public class Product {
     )
     private List<ProductImages> images;
 
-    @OneToMany(mappedBy = "product")
-    Set<ProductClothingSizes> productClothingSizes;
+    @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
+    private Set<ProductClothingSizes> productClothingSizes;
 }
