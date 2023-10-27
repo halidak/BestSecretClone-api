@@ -8,6 +8,8 @@ import com.example.pmaapi.sizes.request.AddProductSize;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class ProductClothingSizesService {
@@ -28,6 +30,7 @@ public class ProductClothingSizesService {
             productClothingSizes.setProduct(product);
             productClothingSizes.setClothingSize(clothingSize);
             productClothingSizes.setAmount(request.getAmount());
+
 
             ProductClothingSizes productSize = productClothingSizesRepository.save(productClothingSizes);
             return productSize;

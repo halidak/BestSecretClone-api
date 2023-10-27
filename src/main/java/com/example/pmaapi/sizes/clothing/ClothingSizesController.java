@@ -1,5 +1,6 @@
 package com.example.pmaapi.sizes.clothing;
 
+import com.example.pmaapi.product.ProductRepository;
 import com.example.pmaapi.sizes.clothing.request.AddSize;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,5 +23,10 @@ public class ClothingSizesController {
     @GetMapping("/get-all")
     public ResponseEntity<List<ClothingSize>> getAll(){
         return ResponseEntity.ok(clothingSizesService.getAll());
+    }
+
+    @GetMapping("/get-by-product/{productId}")
+    public ResponseEntity<List<ClothingSize>> getSizesForProduct(@PathVariable Long productId){
+        return ResponseEntity.ok(clothingSizesService.getAvailableClothingSizesForProduct(productId));
     }
 }

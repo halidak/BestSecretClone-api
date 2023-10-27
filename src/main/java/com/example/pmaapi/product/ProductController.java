@@ -62,4 +62,14 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductById(productId));
     }
 
+    @GetMapping("get-available/{categoryId}")
+    public ResponseEntity<List<ProductDTO>> getAvailable(@PathVariable Long categoryId, @RequestParam Gender gender){
+        return ResponseEntity.ok(productService.getByCategoryGenderAndClothingSize(categoryId, gender));
+    }
+
+    @GetMapping("/user-fav/{userId}")
+    public ResponseEntity<List<ProductDTO>> getUserFav(@PathVariable Long userId){
+        return  ResponseEntity.ok(productService.getUserFavourites(userId));
+    }
+
 }

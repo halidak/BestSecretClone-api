@@ -3,10 +3,7 @@ package com.example.pmaapi.sizes;
 import com.example.pmaapi.product.Product;
 import com.example.pmaapi.sizes.clothing.ClothingSize;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table
@@ -28,10 +25,10 @@ public class ProductClothingSizes {
     )
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Product product;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private ClothingSize clothingSize;
 
     private int amount;

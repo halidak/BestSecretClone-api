@@ -1,6 +1,7 @@
 package com.example.pmaapi.user;
 
 import com.example.pmaapi.addressData.AddressData;
+import com.example.pmaapi.product.Product;
 import com.example.pmaapi.user.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -58,6 +59,20 @@ public class User implements UserDetails {
             referencedColumnName = "id"
     )
     private List<AddressData> addressData;
+
+    @ManyToMany
+    @JoinTable(
+            name = "favourites",
+            joinColumns = @JoinColumn(
+                    name = "user_id",
+                    referencedColumnName = "id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "product_id",
+                    referencedColumnName = "id"
+            )
+    )
+    private List<Product> favourites;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

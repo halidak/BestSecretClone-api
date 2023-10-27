@@ -5,10 +5,7 @@ import com.example.pmaapi.product.productImages.ProductImages;
 import com.example.pmaapi.sizes.ProductClothingSizes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 import java.util.Set;
@@ -58,4 +55,5 @@ public class Product {
 
     @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
     private Set<ProductClothingSizes> productClothingSizes;
+
 }

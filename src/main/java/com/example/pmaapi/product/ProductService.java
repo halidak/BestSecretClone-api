@@ -10,6 +10,8 @@ import com.example.pmaapi.product.request.AddImages;
 import com.example.pmaapi.product.request.AddProduct;
 import com.example.pmaapi.product.request.UpdateProduct;
 import com.example.pmaapi.sizes.ProductClothingSizes;
+import com.example.pmaapi.user.User;
+import com.example.pmaapi.user.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ public class ProductService {
     private final ProductImagesRepository productImagesRepository;
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final UserRepository userRepository;
 
     @Transactional
     public ProductDTO addProduct(AddProduct request){
@@ -107,8 +110,6 @@ public class ProductService {
         return  null;
     }
 
-
-
     public ProductDTO getProductById(Long productId){
         Product product = productRepository.findById(productId).orElse(null);
         Set<ProductClothingSizes> productClothingSizes = new HashSet<>();
@@ -117,5 +118,33 @@ public class ProductService {
         ProductDTO productDTO = mapper.apply(product);
 
         return productDTO;
+    }
+
+    public List<ProductDTO> getByCategoryGenderAndClothingSize(Long categoryId, Gender gender) {
+        List<Product> products = productRepository.findProductsByCategoryGenderAndSizeGreaterThanZero(categoryId, gender);
+
+        ProductDTOMapper mapper = new ProductDTOMapper();
+        List<ProductDTO> productDTOs = products.stream()
+                .map(product -> mapper.apply(product))
+                .collect(Collectors.toList());
+
+        return productDTOs;
+    }
+
+    private boolean hasClothingSizeWithAmountGreaterThanZero(Product product) {
+        return product.getProductClothingSizes().stream()
+                .anyMatch(clothingSize -> clothingSize.getAmount() > 0);
+    }
+
+    public List<ProductDTO> getUserFavourites(Long userId){
+        User user = userRepository.findById(userId).orElse(null);
+
+        List<Product> products = user.getFavourites();
+
+        ProductDTOMapper productDTOMapper = new ProductDTOMapper();
+        return products.stream()
+                .map(product -> productDTOMapper.apply(product))
+                .collect(Collectors.toList());
+
     }
 }

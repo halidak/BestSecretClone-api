@@ -31,6 +31,6 @@ public class ClothingSize {
     private Long id;
     private String name;
 
-    @OneToMany(mappedBy = "clothingSize")
+    @OneToMany(mappedBy = "clothingSize", fetch = FetchType.EAGER)
     Set<ProductClothingSizes> productClothingSizes;
 }
