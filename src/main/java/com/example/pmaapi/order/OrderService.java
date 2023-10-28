@@ -3,6 +3,7 @@ package com.example.pmaapi.order;
 import com.example.pmaapi.config.JwtService;
 import com.example.pmaapi.order.request.CreateOrder;
 import com.example.pmaapi.order.response.OrderResponse;
+import com.example.pmaapi.order.response.UserOrders;
 import com.example.pmaapi.orderDetails.OrderDetails;
 import com.example.pmaapi.orderDetails.OrderDetailsRepository;
 import com.example.pmaapi.orderDetails.request.OrderItem;
@@ -15,10 +16,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -99,7 +98,54 @@ public class OrderService {
         return orderResponse;
     }
 
-    //get orders from user
+    //get orders from user with products
+    public List<UserOrders> getOrders(String token){
+        var user = jwtService.getUserFromToken(token);
+        List<Order> orders = orderRepository.findAllByUser(user);
+        List<UserOrders> userOrders = new ArrayList<>();
+        for (Order order : orders) {
+            UserOrders userOrder = UserOrders.builder()
+                    .orderId(order.getId())
+                    .orderDate(order.getOrderDate())
+                    .paymentMethod(order.getPaymentMethod().toString())
+                    .fullPrice(order.getFullPrice())
+                    .build();
 
+            List<Product> products = new ArrayList<>();
+            for (OrderDetails orderDetail : order.getOrderDetails()) {
+                Product product = new Product();
+                product.setId(orderDetail.getProduct().getId());
+                product.setName(orderDetail.getProduct().getName());
+                product.setPrice(orderDetail.getProduct().getPrice());
+                product.setGender(orderDetail.getProduct().getGender());
+                product.setProductClothingSizes(orderDetail.getProduct().getProductClothingSizes());
+                product.setImages(orderDetail.getProduct().getImages());
+                product.setDescription(orderDetail.getProduct().getDescription());
+                products.add(product);
+            }
+            userOrder.setProducts(products);
 
+            userOrders.add(userOrder);
+        }
+
+        return userOrders;
+    }
+
+    //get order by id and return UserOrders
+    public UserOrders getOrderById(Long orderId){
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        Order order = optionalOrder.get();
+        List<Product> products = order.getOrderDetails().stream()
+                .map(OrderDetails::getProduct)
+                .collect(Collectors.toList());
+
+        return UserOrders.builder()
+                .orderId(order.getId())
+                .orderDate(order.getOrderDate())
+                .paymentMethod(order.getPaymentMethod().toString())
+                .fullPrice(order.getFullPrice())
+                .products(products)
+                .build();
+
+    }
 }

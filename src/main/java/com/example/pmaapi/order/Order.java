@@ -45,7 +45,9 @@ public class Order {
     private PaymentMethod paymentMethod;
 
     @JsonIgnore
-    @OneToMany
+    @OneToMany(
+            cascade = CascadeType.ALL
+    )
     @JoinColumn(
             name = "order_id",
             referencedColumnName = "id"

@@ -44,7 +44,6 @@ public class Product {
     )
     private Category category;
 
-    @JsonIgnore
     @OneToMany(
             cascade = CascadeType.ALL
     )
