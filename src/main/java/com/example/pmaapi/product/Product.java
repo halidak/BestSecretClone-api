@@ -1,6 +1,7 @@
 package com.example.pmaapi.product;
 
 import com.example.pmaapi.category.Category;
+import com.example.pmaapi.orderDetails.OrderDetails;
 import com.example.pmaapi.product.productImages.ProductImages;
 import com.example.pmaapi.sizes.ProductClothingSizes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -55,5 +56,13 @@ public class Product {
 
     @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
     private Set<ProductClothingSizes> productClothingSizes;
+
+    @JsonIgnore
+    @OneToMany
+    @JoinColumn(
+            name = "product_id",
+            referencedColumnName = "id"
+    )
+    private List<OrderDetails> orderDetails;
 
 }

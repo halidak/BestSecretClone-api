@@ -1,9 +1,12 @@
 package com.example.pmaapi.sizes;
 
+import com.example.pmaapi.orderDetails.OrderDetails;
 import com.example.pmaapi.product.Product;
 import com.example.pmaapi.sizes.clothing.ClothingSize;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table
@@ -32,4 +35,11 @@ public class ProductClothingSizes {
     private ClothingSize clothingSize;
 
     private int amount;
+
+    @OneToMany
+    @JoinColumn(
+            name = "product_csize_id",
+            referencedColumnName = "id"
+    )
+    private List<OrderDetails> orderDetails;
 }

@@ -1,8 +1,8 @@
 package com.example.pmaapi.user;
 
 import com.example.pmaapi.addressData.AddressData;
+import com.example.pmaapi.order.Order;
 import com.example.pmaapi.product.Product;
-import com.example.pmaapi.user.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -73,6 +73,13 @@ public class User implements UserDetails {
             )
     )
     private List<Product> favourites;
+
+    @OneToMany
+    @JoinColumn(
+            name = "user_id",
+            referencedColumnName = "id"
+    )
+    private List<Order> orders;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
