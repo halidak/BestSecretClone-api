@@ -3,10 +3,7 @@ package com.example.pmaapi.sizes;
 import com.example.pmaapi.sizes.request.AddProductSize;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/csize-product")
@@ -18,5 +15,11 @@ public class ProductClothingSizesController {
     @PostMapping("/add")
     public ResponseEntity<ProductClothingSizes> add(@RequestBody AddProductSize request){
         return ResponseEntity.ok(productClothingSizesService.addSize(request));
+    }
+
+    //update amount
+    @PutMapping("/update-amount")
+    public ResponseEntity<AddProductSize> updateAmount(@RequestBody AddProductSize request){
+        return ResponseEntity.ok(productClothingSizesService.updateAmount(request));
     }
 }

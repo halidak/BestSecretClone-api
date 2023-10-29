@@ -1,5 +1,7 @@
 package com.example.pmaapi.order;
 
+import com.example.pmaapi.addressData.AddressData;
+import com.example.pmaapi.addressData.AddressDataRepository;
 import com.example.pmaapi.config.JwtService;
 import com.example.pmaapi.order.request.CreateOrder;
 import com.example.pmaapi.order.response.OrderResponse;
@@ -28,6 +30,7 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final JwtService jwtService;
     private final ProductClothingSizesRepository productClothingSizesRepository;
+    private final AddressDataRepository addressDataRepository;
 
     @Transactional
     public OrderResponse createOrder(CreateOrder request, String token){
@@ -35,6 +38,9 @@ public class OrderService {
         Order order = new Order();
         //trenutni datum
         order.setOrderDate(new Date());
+
+        AddressData addressData = addressDataRepository.findById(request.getAddressDataId()).orElse(null);
+        order.setAddressData(addressData);
 
         order.setPaymentMethod(request.getPaymentMethod());
         order.setUser(user);
@@ -93,6 +99,10 @@ public class OrderService {
                 .orderDate(order.getOrderDate())
                 .paymentMethod(request.getPaymentMethod())
                 .fullPrice(totalPrice)
+                .products(orderDetailsList.stream()
+                        .map(OrderDetails::getProduct)
+                        .collect(Collectors.toList()))
+                .addressData(order.getAddressData())
                 .build();
 
         return orderResponse;
@@ -146,6 +156,20 @@ public class OrderService {
                 .fullPrice(order.getFullPrice())
                 .products(products)
                 .build();
+    }
 
+    //cancel order
+    public void cancelOrder(Long orderId){
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        Order order = optionalOrder.get();
+        List<OrderDetails> orderDetails = order.getOrderDetails();
+        for (OrderDetails orderDetail : orderDetails) {
+            ProductClothingSizes productClothingSizes = orderDetail.getProductClothingSize();
+            int currentAmount = productClothingSizes.getAmount();
+            int amount = orderDetail.getAmount();
+            productClothingSizes.setAmount(currentAmount + amount);
+            productClothingSizesRepository.save(productClothingSizes);
+        }
+        orderRepository.delete(order);
     }
 }

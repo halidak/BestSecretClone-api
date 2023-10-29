@@ -1,5 +1,6 @@
 package com.example.pmaapi.addressData;
 
+import com.example.pmaapi.order.Order;
 import com.example.pmaapi.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -7,6 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Table
@@ -39,4 +42,12 @@ public class AddressData {
             referencedColumnName = "id"
     )
     private User user;
+
+    @JsonIgnore
+    @OneToMany
+    @JoinColumn(
+            name = "addressData_id",
+            referencedColumnName = "id"
+    )
+    private List<Order> orders;
 }

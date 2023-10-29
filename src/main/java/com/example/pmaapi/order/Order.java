@@ -1,5 +1,6 @@
 package com.example.pmaapi.order;
 
+import com.example.pmaapi.addressData.AddressData;
 import com.example.pmaapi.orderDetails.OrderDetails;
 import com.example.pmaapi.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -53,5 +54,12 @@ public class Order {
             referencedColumnName = "id"
     )
     private List<OrderDetails> orderDetails;
+
+    @ManyToOne
+    @JoinColumn(
+            name = "addressData_id",
+            referencedColumnName = "id"
+    )
+    private AddressData addressData;
 
 }

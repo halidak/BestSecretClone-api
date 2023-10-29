@@ -17,5 +17,6 @@ import java.util.Map;
 @NoArgsConstructor
 public class CreateOrder {
     private PaymentMethod paymentMethod;
+    private Long addressDataId;
     private List<OrderItem> orderItems;
 }

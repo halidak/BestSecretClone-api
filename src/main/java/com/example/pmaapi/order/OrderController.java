@@ -28,4 +28,11 @@ public class OrderController {
     public ResponseEntity<UserOrders> getById(@PathVariable Long orderId){
         return ResponseEntity.ok(orderService.getOrderById(orderId));
     }
+
+    //cancel order
+    @DeleteMapping("/delete/{orderId}")
+    public ResponseEntity<String> deleteOrder(@PathVariable Long orderId){
+        orderService.cancelOrder(orderId);
+        return ResponseEntity.ok("Uspesno obrisano");
+    }
 }

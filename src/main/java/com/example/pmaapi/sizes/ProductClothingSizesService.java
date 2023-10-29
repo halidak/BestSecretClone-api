@@ -39,4 +39,23 @@ public class ProductClothingSizesService {
         return null;
     }
 
+    //update amount
+    public AddProductSize updateAmount(AddProductSize request){
+        ProductClothingSizes productClothingSizes = productClothingSizesRepository
+                .findByProduct_IdAndClothingSize_Id(request.getProductId(), request.getClothingSizeId());
+
+        if(productClothingSizes != null){
+            productClothingSizes.setAmount(request.getAmount());
+            productClothingSizesRepository.save(productClothingSizes);
+
+            AddProductSize updatedProductSize = new AddProductSize();
+            updatedProductSize.setProductId(productClothingSizes.getProduct().getId());
+            updatedProductSize.setClothingSizeId(productClothingSizes.getClothingSize().getId());
+            updatedProductSize.setAmount(productClothingSizes.getAmount());
+
+            return updatedProductSize;
+        } else {
+            throw new RuntimeException("Proizvod i/ili veličina odjeće nije pronađena.");
+        }
+    }
 }
