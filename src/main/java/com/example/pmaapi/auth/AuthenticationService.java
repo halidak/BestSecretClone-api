@@ -68,4 +68,8 @@ public class AuthenticationService {
             throw new IllegalStateException("Invalid email or password");
         }
     }
+
+    //verifikacija maila
+    //forgot password
+    //reset password
 }

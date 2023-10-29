@@ -5,6 +5,7 @@ import com.example.pmaapi.addressData.request.UpdateAddress;
 import com.example.pmaapi.product.request.AddImages;
 import com.example.pmaapi.product.request.AddProduct;
 import com.example.pmaapi.product.request.UpdateProduct;
+import com.example.pmaapi.user.request.UpdateUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -71,5 +72,6 @@ public class ProductController {
     public ResponseEntity<List<ProductDTO>> getUserFav(@PathVariable Long userId){
         return  ResponseEntity.ok(productService.getUserFavourites(userId));
     }
+
 
 }
