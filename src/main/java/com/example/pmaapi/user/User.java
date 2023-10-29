@@ -75,6 +75,7 @@ public class User implements UserDetails {
     )
     private List<Product> favourites;
 
+    @JsonIgnore
     @OneToMany
     @JoinColumn(
             name = "user_id",

@@ -55,6 +55,7 @@ public class Order {
     )
     private List<OrderDetails> orderDetails;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(
             name = "addressData_id",

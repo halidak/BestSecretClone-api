@@ -3,6 +3,7 @@ package com.example.pmaapi.sizes;
 import com.example.pmaapi.orderDetails.OrderDetails;
 import com.example.pmaapi.product.Product;
 import com.example.pmaapi.sizes.clothing.ClothingSize;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 

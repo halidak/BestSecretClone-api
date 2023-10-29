@@ -3,6 +3,7 @@ package com.example.pmaapi.orderDetails;
 import com.example.pmaapi.order.Order;
 import com.example.pmaapi.product.Product;
 import com.example.pmaapi.sizes.ProductClothingSizes;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,6 +32,7 @@ public class OrderDetails {
 
     private int amount;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(
             name = "order_id",
@@ -38,6 +40,7 @@ public class OrderDetails {
     )
     private Order order;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(
             name = "product_id",
@@ -45,6 +48,7 @@ public class OrderDetails {
     )
     private Product product;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(
             name = "product_csize_id",

@@ -31,6 +31,7 @@ public class ClothingSize {
     private Long id;
     private String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "clothingSize", fetch = FetchType.EAGER)
     Set<ProductClothingSizes> productClothingSizes;
 }

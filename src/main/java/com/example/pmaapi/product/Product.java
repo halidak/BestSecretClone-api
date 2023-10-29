@@ -44,6 +44,7 @@ public class Product {
     )
     private Category category;
 
+    @JsonIgnore
     @OneToMany(
             cascade = CascadeType.ALL
     )
@@ -53,6 +54,7 @@ public class Product {
     )
     private List<ProductImages> images;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "product", fetch = FetchType.EAGER)
     private Set<ProductClothingSizes> productClothingSizes;
 

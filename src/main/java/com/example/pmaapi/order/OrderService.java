@@ -13,6 +13,14 @@ import com.example.pmaapi.product.Product;
 import com.example.pmaapi.product.ProductRepository;
 import com.example.pmaapi.sizes.ProductClothingSizes;
 import com.example.pmaapi.sizes.ProductClothingSizesRepository;
+import com.example.pmaapi.user.User;
+import com.mailjet.client.ClientOptions;
+import com.mailjet.client.MailjetClient;
+import com.mailjet.client.errors.MailjetException;
+import com.mailjet.client.transactional.SendContact;
+import com.mailjet.client.transactional.SendEmailsRequest;
+import com.mailjet.client.transactional.TrackOpens;
+import com.mailjet.client.transactional.TransactionalEmail;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +39,11 @@ public class OrderService {
     private final JwtService jwtService;
     private final ProductClothingSizesRepository productClothingSizesRepository;
     private final AddressDataRepository addressDataRepository;
+    private String mailjetApiKey = System.getenv("mailjet_apikey");
+    private String mailjetApiSecret = System.getenv("mailjet_apikeySecret");
 
     @Transactional
-    public OrderResponse createOrder(CreateOrder request, String token){
+    public OrderResponse createOrder(CreateOrder request, String token) throws MailjetException{
         var user = jwtService.getUserFromToken(token);
         Order order = new Order();
         //trenutni datum
@@ -105,6 +115,8 @@ public class OrderService {
                 .addressData(order.getAddressData())
                 .build();
 
+        sendConfirmationEmail(orderResponse, user);
+
         return orderResponse;
     }
 
@@ -172,4 +184,57 @@ public class OrderService {
         }
         orderRepository.delete(order);
     }
+
+    //send confirmation email
+    public void sendConfirmationEmail(OrderResponse response, User user) throws MailjetException {
+        ClientOptions options = ClientOptions.builder()
+                .apiKey(mailjetApiKey)
+                .apiSecretKey(mailjetApiSecret)
+                .build();
+
+        MailjetClient client = new MailjetClient(options);
+
+        TransactionalEmail email = TransactionalEmail
+                .builder()
+                .to(new SendContact(user.getEmail(), String.format("%s %s", user.getFirstName(), user.getLastName())))
+                .from(new SendContact("halida.karisik6@gmail.com", "BestSecret Team"))
+                .htmlPart(generateOrderConfirmationHtml(response))
+                .subject("Conformation email")
+                .trackOpens(TrackOpens.ENABLED)
+                .build();
+
+        SendEmailsRequest emailRequest = SendEmailsRequest.builder().message(email).build();
+        emailRequest.sendWith(client);
+    }
+
+    private String generateOrderConfirmationHtml(OrderResponse orderResponse) {
+        String html = "<html>";
+        html += "<body>";
+        html += "<h1>You have successfully completed your order</h1> ";
+        html += "<h1>Detalji narudžbine</h1>";
+        html += "<p>Datum narudžbine: " + orderResponse.getOrderDate() + "</p>";
+        html += "<p>Ukupna cena: " + orderResponse.getFullPrice() + "</p>";
+        html += "<p>Način plaćanja: " + orderResponse.getPaymentMethod() + "</p>";
+        html += "<p>Adresa: " + orderResponse.getAddressData().getAddress() + "</p>";
+        html += "<p>Grad: " + orderResponse.getAddressData().getCity() + "</p>";
+        html += "<p>Broj telefona: " + orderResponse.getAddressData().getPhoneNumber() + "</p>";
+        html += "<p>Proizvodi: </p>";
+        //separator
+        html += "<hr>";
+        List<Product> products = orderResponse.getProducts();
+        for (Product product : products) {
+            html += "<div>";
+            // Prikaz slike, naziva i cene
+            html += "<img src='" + product.getImages().get(0).getPhoto() + "' width='60' height='60' alt='Product Image'>";
+            html += "<p>Naziv: " + product.getName() + "</p>";
+            html += "<p>Cena: " + product.getPrice() + "</p>";
+            html += "</div>";
+        }
+
+        html += "</body>";
+        html += "</html>";
+
+        return html;
+    }
+
 }

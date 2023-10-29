@@ -4,6 +4,7 @@ package com.example.pmaapi.order;
 import com.example.pmaapi.order.request.CreateOrder;
 import com.example.pmaapi.order.response.OrderResponse;
 import com.example.pmaapi.order.response.UserOrders;
+import com.mailjet.client.errors.MailjetException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,8 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/create")
-    public OrderResponse createOrder(@RequestBody CreateOrder request, @RequestHeader("Authorization") String token) {
+    public OrderResponse createOrder
+            (@RequestBody CreateOrder request, @RequestHeader("Authorization") String token) throws MailjetException {
         return orderService.createOrder(request, token);
     }
 
