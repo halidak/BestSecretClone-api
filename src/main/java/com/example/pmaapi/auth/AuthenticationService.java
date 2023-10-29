@@ -2,17 +2,35 @@ package com.example.pmaapi.auth;
 
 import com.example.pmaapi.auth.request.LoginRequest;
 import com.example.pmaapi.auth.request.RegisterRequest;
+import com.example.pmaapi.auth.request.ResetPasswordRequest;
 import com.example.pmaapi.auth.response.AuthenticationResponse;
 import com.example.pmaapi.config.JwtService;
 import com.example.pmaapi.user.User;
 import com.example.pmaapi.user.UserDTOMapper;
 import com.example.pmaapi.user.UserRepository;
+import com.example.pmaapi.verification.Verification;
+import com.example.pmaapi.verification.VerificationRepository;
+import com.example.pmaapi.verification.VerificationType;
+import com.example.pmaapi.verification.request.VerificationRequest;
+import com.mailjet.client.ClientOptions;
+import com.mailjet.client.MailjetClient;
+import com.mailjet.client.errors.MailjetException;
+import com.mailjet.client.transactional.SendContact;
+import com.mailjet.client.transactional.SendEmailsRequest;
+import com.mailjet.client.transactional.TrackOpens;
+import com.mailjet.client.transactional.TransactionalEmail;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.antlr.v4.runtime.misc.LogManager;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 
@@ -25,8 +43,13 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserDTOMapper userDTOMapper;
+    private String mailjetApiKey = System.getenv("mailjet_apikey");
+    private String mailjetApiSecret = System.getenv("mailjet_apikeySecret");
+    private final VerificationRepository verificationRepository;
+    private EntityManager entityManager;
 
-    public AuthenticationResponse register(RegisterRequest request) {
+
+    public AuthenticationResponse register(RegisterRequest request) throws MailjetException {
         Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
 
         if (existingUser.isPresent()) {
@@ -41,8 +64,11 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
+                .verified(false)
                 .build();
+
         userRepository.save(user);
+        sendVerificationEmail(user);
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
@@ -69,7 +95,133 @@ public class AuthenticationService {
         }
     }
 
-    //verifikacija maila
-    //forgot password
-    //reset password
+    //send verification email
+    @Transactional
+    private void sendVerificationEmail(User user) throws MailjetException {
+        var rand = new SecureRandom();
+        StringBuilder code = new StringBuilder();
+        for (int i = 0; i < 6; i++)
+            code.append(rand.nextInt(10));
+        var verification = Verification.builder()
+                .user(user)
+                .code(code.toString())
+                .type(VerificationType.EMAIL_VERIFICATION)
+                .build();
+        verificationRepository.save(verification);
+
+        ClientOptions options = ClientOptions.builder()
+                .apiKey(mailjetApiKey)
+                .apiSecretKey(mailjetApiSecret)
+                .build();
+
+        MailjetClient client = new MailjetClient(options);
+
+        TransactionalEmail email = TransactionalEmail
+                .builder()
+                .to(new SendContact(user.getEmail(), String.format("%s %s", user.getFirstName(), user.getLastName())))
+                .from(new SendContact("halida.karisik6@gmail.com", "BestSecret Team"))
+                .htmlPart("<h1>Please enter the code in your app</h1><p>Your code: " + code.toString() + "</p>")
+                .subject("Email verification")
+                .trackOpens(TrackOpens.ENABLED)
+                .build();
+
+        SendEmailsRequest emailRequest = SendEmailsRequest.builder().message(email).build();
+        emailRequest.sendWith(client);
+    }
+
+    public AuthenticationResponse verifyEmail(VerificationRequest request) {
+        var verificationOptional = verificationRepository
+                .findByCodeAndUserEmail(request.getCode(), request.getEmail());
+        if(verificationOptional.isEmpty())
+            throw new IllegalStateException("Invalid code");
+        var verification = verificationOptional.get();
+        if(verification.getType() != VerificationType.EMAIL_VERIFICATION)
+            throw new IllegalStateException("Invalid code");
+        var user = verification.getUser();
+        var now = LocalDateTime.now();
+        var oneDayAgo = now.minusDays(1);
+        long minutesDifference = ChronoUnit.MINUTES.between(verification.getCreatedAt(), LocalDateTime.now());
+
+        /*if(minutesDifference > 15)
+            throw new IllegalStateException("Code expired");
+
+        entityManager.createQuery("DELETE FROM Verification t WHERE t.createdAt < :dayAgo")
+                .setParameter("dayAgo", oneDayAgo)
+                .executeUpdate();*/
+
+        user.setVerified(true);
+        userRepository.save(user);
+        verificationRepository.delete(verification);
+        var jwtToken = jwtService.generateToken(user);
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .user(userDTOMapper.apply(user))
+                .build();
+    }
+
+    @Transactional
+    private void sendPasswordResetEmail(User user) throws MailjetException {
+        var rand = new SecureRandom();
+        StringBuilder code = new StringBuilder();
+        for (int i = 0; i < 6; i++)
+            code.append(rand.nextInt(10));
+        var verification = Verification.builder()
+                .user(user)
+                .code(code.toString())
+                .type(VerificationType.PASSWORD_RESET)
+                .build();
+        verificationRepository.save(verification);
+
+        ClientOptions options = ClientOptions.builder()
+                .apiKey(mailjetApiKey)
+                .apiSecretKey(mailjetApiSecret)
+                .build();
+
+        MailjetClient client = new MailjetClient(options);
+
+        TransactionalEmail email = TransactionalEmail
+                .builder()
+                .to(new SendContact(user.getEmail(), String.format("%s %s", user.getFirstName(), user.getLastName())))
+                .from(new SendContact("halida.karisik6@gmail.com", "BestSecret Team"))
+                .htmlPart("<h1>Please enter the code in your app</h1><p>Your code: " + code.toString() + "</p>")
+                .subject("Email verification")
+                .trackOpens(TrackOpens.ENABLED)
+                .build();
+
+        SendEmailsRequest emailRequest = SendEmailsRequest.builder().message(email).build();
+        emailRequest.sendWith(client);
+    }
+
+    public void forgotPassword(String email) throws MailjetException {
+        var user = userRepository.findByEmail(email).orElseThrow(
+                () -> new IllegalStateException("User with this email does not exist")
+        );
+        sendPasswordResetEmail(user);
+
+    }
+
+    public void resetPassword(ResetPasswordRequest request) {
+        var verificationOptional = verificationRepository.findByCodeAndUserEmail(request.getCode(), request.getEmail());
+        if(verificationOptional.isEmpty())
+            throw new IllegalStateException("Invalid code");
+        var verification = verificationOptional.get();
+        if(verification.getType() != VerificationType.PASSWORD_RESET)
+            throw new IllegalStateException("Invalid code");
+        var user = verification.getUser();
+        var now = LocalDateTime.now();
+        var oneDayAgo = now.minusDays(1);
+        long minutesDifference = ChronoUnit.MINUTES.between(verification.getCreatedAt(), LocalDateTime.now());
+       /* if(minutesDifference > 15)
+            throw new IllegalStateException("Code expired");
+
+        entityManager.createQuery("DELETE FROM Verification t WHERE t.createdAt < :dayAgo")
+                .setParameter("dayAgo", oneDayAgo)
+                .executeUpdate();*/
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        userRepository.save(user);
+        verificationRepository.delete(verification);
+
+    }
+
 }

@@ -25,7 +25,10 @@ public class SecurityConfiguration {
                 .disable()
                 .authorizeHttpRequests()
                 .requestMatchers("/auth/register",
-                        "/auth/login")
+                        "/auth/login",
+                        "/auth/verify-email",
+                        "auth/forgot-password",
+                        "auth/reset-password")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
