@@ -32,6 +32,6 @@ public class ClothingSize {
     private String name;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "clothingSize", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "clothingSize", fetch = FetchType.LAZY)
     Set<ProductClothingSizes> productClothingSizes;
 }
