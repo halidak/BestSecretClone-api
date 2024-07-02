@@ -22,11 +22,14 @@ import com.mailjet.client.transactional.TransactionalEmail;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.antlr.v4.runtime.misc.LogManager;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -36,6 +39,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthenticationService {
 
     private final UserRepository userRepository;
@@ -43,8 +47,11 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserDTOMapper userDTOMapper;
-    private String mailjetApiKey = System.getenv("mailjet_apikey");
-    private String mailjetApiSecret = System.getenv("mailjet_apikeySecret");
+    @Value("${mailjet_apikey}")
+    private String mailjetApiKey;
+    @Value("${mailjet_apikeySecret}")
+    private String mailjetApiSecret;
+
     private final VerificationRepository verificationRepository;
     private EntityManager entityManager;
 
@@ -68,6 +75,10 @@ public class AuthenticationService {
                 .build();
 
         userRepository.save(user);
+        log.info("Mailjet API Key: {}", mailjetApiKey);
+        log.info("Mailjet API Secret: {}", mailjetApiSecret);
+
+
         sendVerificationEmail(user);
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()

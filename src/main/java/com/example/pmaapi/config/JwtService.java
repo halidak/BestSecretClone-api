@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.security.Key;
 import java.util.Date;
@@ -24,7 +25,8 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class JwtService {
 
-    private static final String SECRET_KEY = System.getenv("jwt_secret");
+    @Value("${jwt_secret}")
+    private String SECRET_KEY;
     private final UserRepository userRepository;
     private final UserDTOMapper userDTOMapper;
 
